@@ -13,7 +13,6 @@ const app = express();
 const jsonParser = bodyParser.json();
 let browser;
 let context;
-let page;
 
 const getHtmlContent = json => `
   <html>
@@ -47,10 +46,15 @@ app.use(express.static('public'));
 app.post('/', jsonParser, async (req, res) => {
   const start = process.hrtime.bigint();
   const json = JSON.stringify(req.body);
+  const page = await context.newPage();
+  await page.setViewportSize({
+    width: BROWSER_WIDTH,
+    height: BROWSER_HEIGHT
+  });
   await page.setContent(getHtmlContent(json));
   const path = join(screenshotsDirPath, `${process.hrtime.bigint()}.jpg`);
   await page.screenshot({ path });
-  // await page.close();
+  await page.close();
   res.end();
   const end = process.hrtime.bigint();
   console.log(`Handler execution time ${Number(end - start) / 1000000} ms`);
@@ -62,12 +66,12 @@ app.get('/stop', async (req, res) => {
   process.exit(0);
 });
 
+// dummy route for loading tests
+app.get('/dummy', (req, res) => {
+  res.send();
+});
+
 app.listen(PORT, async () => {
   browser = await chromium.launch({ headless: IS_HEADLESS });
   context = await browser.newContext({ ignoreHTTPSErrors: true, locale: 'en-US' });
-  page = await context.newPage();
-  await page.setViewportSize({
-    width: BROWSER_WIDTH,
-    height: BROWSER_HEIGHT
-  });
 });

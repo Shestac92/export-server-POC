@@ -14,6 +14,7 @@
   },
   "scripts": {
     "start": "node ./src",
-    "load-test": "artillery run ./tests/load-test.yml --insecure -o result.json"
+    "load-test": "artillery run ./tests/load-test.yml --insecure -o result.json",
+    "dummy-load-test": "artillery run ./tests/load-test-dummy.yml --insecure -o result.json"
   }
 }
