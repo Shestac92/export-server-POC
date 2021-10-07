@@ -1,18 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { chromium } = require('playwright-chromium');
 const { mkdirSync, existsSync } = require('fs');
 const { resolve, join } = require('path');
 
 const PORT = 3000;
-const IS_HEADLESS = false;
-const BROWSER_WIDTH = 600;
-const BROWSER_HEIGHT = 600;
 const screenshotsDirPath = resolve(__dirname, '..', 'screenshots');
 const app = express();
 const jsonParser = bodyParser.json();
-let browser;
-let context;
 
 const getHtmlContent = json => `
   <html>
@@ -46,11 +40,7 @@ app.use(express.static('public'));
 app.post('/', jsonParser, async (req, res) => {
   const start = process.hrtime.bigint();
   const json = JSON.stringify(req.body);
-  const page = await context.newPage();
-  await page.setViewportSize({
-    width: BROWSER_WIDTH,
-    height: BROWSER_HEIGHT
-  });
+
   await page.setContent(getHtmlContent(json));
   const path = join(screenshotsDirPath, `${process.hrtime.bigint()}.jpg`);
   await page.screenshot({ path });
@@ -72,6 +62,5 @@ app.get('/dummy', (req, res) => {
 });
 
 app.listen(PORT, async () => {
-  browser = await chromium.launch({ headless: IS_HEADLESS });
-  context = await browser.newContext({ ignoreHTTPSErrors: true, locale: 'en-US' });
+
 });
