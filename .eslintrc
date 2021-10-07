@@ -1,0 +1,92 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": [
+    "airbnb-base"
+  ],
+  "rules": {
+    // Sets line break to Windows CRLF.
+    "linebreak-style": "off",
+
+    // Allows writting arrow-function params without ().
+    "arrow-parens": ["error", "as-needed"],
+
+    // Enables i++.
+    "no-plusplus": "off",
+
+    /*
+      Allows writting records like
+
+      const foo =
+        superLongLongLongLongLongLongLongLongFunctionName();
+    */
+    "operator-linebreak": "off",
+
+    // Allows records like 0 == false.
+    "eqeqeq": "off",
+
+    // Allows to skip using braces in switch-case blocks.
+    "no-case-declarations": "off",
+
+    /*
+      Denies adding comma at the end like
+
+      const foo = {
+        bar: "baz",
+        qux: "quux",
+      };
+    */
+    "comma-dangle": ["error", "never"],
+
+    // Allows records like this.foo_ = true;
+    "no-underscore-dangle": "off",
+
+    /*
+        Limits max finction size to 40 lines.
+        Skips comments, considers blank lines.
+        Disabled for a while.
+    */
+    // "max-lines-per-function": ["error", {"max": 40, "skipComments": true}],
+
+    /*
+        Limits the allowed number of paramters in function.
+        Max allowed is 4.
+        Disabled for a while.
+    */
+    // "max-params": ["error", 4],
+
+    // Limits the cyclomatic complexity.
+    "complexity": ["error", 5],
+
+    /*
+        Limits max nested callbacks count like
+
+        foo1(function() {
+          foo2(function() {
+            foo3(function() {
+              foo4(function() {
+                // Do something
+              });
+            });
+          });
+        });
+    */
+    "max-nested-callbacks": ["error", 2],
+
+    // Allows writting void 0 instead of undefined.
+    "no-void": "off"
+
+  },
+  "globals": {
+    "page": true,
+    "browser": true,
+    "context": true,
+    "consoleErrors": true,
+    "Tabulator": true,
+    "io": true,
+    "moment": true,
+    "flatpickr": true
+  }
+}
