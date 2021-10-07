@@ -2,15 +2,18 @@ config:
   target: "http://localhost:3000"
   phases:
     - duration: 20
-      arrivalRate: 1
-      rampTo: 1
+      arrivalRate: 2
       name: Warm up
-    # - duration: 20
-    #   arrivalRate: 1
-    #   name: Ramp up load
+    - duration: 20
+      arrivalRate: 1
+      rampTo: 15
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 15
+      name: Sustained load
 
 scenarios:
-  - name: "Search and buy"
+  - name: "Pie chart"
     flow:
       - post:
           url: "/"
