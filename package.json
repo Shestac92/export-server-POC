@@ -9,10 +9,11 @@
   "devDependencies": {
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.24.2"
+    "eslint-plugin-import": "^2.24.2",
+    "artillery": "^1.7.9"
   },
   "scripts": {
     "start": "node ./src",
-    "check-env": "node -e 'console.log(process.env)' | grep npm"
+    "load-test": "artillery run ./tests/load-test.yml --insecure -o result.json"
   }
 }

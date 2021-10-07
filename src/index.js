@@ -11,8 +11,9 @@ const BROWSER_HEIGHT = 600;
 const screenshotsDirPath = resolve(__dirname, '..', 'screenshots');
 const app = express();
 const jsonParser = bodyParser.json();
-
-// <script src="localhost:3000/anychart-bundle.min.js"></script>
+let browser;
+let context;
+let page;
 
 const getHtmlContent = json => `
   <html>
@@ -44,22 +45,29 @@ if (!existsSync(screenshotsDirPath)) {
 app.use(express.static('public'));
 
 app.post('/', jsonParser, async (req, res) => {
+  const start = process.hrtime.bigint();
   const json = JSON.stringify(req.body);
-  const browser = await chromium.launch({ headless: IS_HEADLESS });
-  const context = await browser.newContext({ ignoreHTTPSErrors: true, locale: 'en-US' });
-  const page = await context.newPage();
+  await page.setContent(getHtmlContent(json));
+  const path = join(screenshotsDirPath, `${process.hrtime.bigint()}.jpg`);
+  await page.screenshot({ path });
+  // await page.close();
+  res.end();
+  const end = process.hrtime.bigint();
+  console.log(`Handler execution time ${Number(end - start) / 1000000} ms`);
+});
+
+app.get('/stop', async (req, res) => {
+  await browser.close();
+  res.send();
+  process.exit(0);
+});
+
+app.listen(PORT, async () => {
+  browser = await chromium.launch({ headless: IS_HEADLESS });
+  context = await browser.newContext({ ignoreHTTPSErrors: true, locale: 'en-US' });
+  page = await context.newPage();
   await page.setViewportSize({
     width: BROWSER_WIDTH,
     height: BROWSER_HEIGHT
   });
-
-  await page.setContent(getHtmlContent(json));
-  const path = join(screenshotsDirPath, `${process.hrtime.bigint()}.jpg`);
-  await page.screenshot({ path });
-  // await page.waitForTimeout(5000);
-  res.end();
-  await browser.close();
-  process.exit(0);
 });
-
-app.listen(PORT, () => { });

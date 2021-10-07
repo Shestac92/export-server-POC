@@ -1,0 +1,25 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 20
+      arrivalRate: 1
+      rampTo: 1
+      name: Warm up
+    # - duration: 20
+    #   arrivalRate: 1
+    #   name: Ramp up load
+
+scenarios:
+  - name: "Search and buy"
+    flow:
+      - post:
+          url: "/"
+          json: {
+                  "chart": {
+                    "type": "pie",
+                    "data": [
+                      {"x": "Apples", "value": "128.14", "fill": "green"},
+                      {"x": "Oranges", "value": "128.14", "fill": "orange"}
+                    ]
+                  }
+                }
