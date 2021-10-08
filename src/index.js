@@ -11,25 +11,25 @@ const app = express();
 const jsonParser = bodyParser.json();
 const tabPool = new TabPool(screenshotsDirPath, 5);
 
-const getHtmlContent = json => `
+const getHtmlContent = (json, width, height) => `
   <html>
       <head>
           <title>Example</title>
           <style>html, body, #container {
-            width: 100%;
-            height: 100%;
+            width: ${width}px;
+            height: ${height}px;
             margin: 0;
             padding: 0;
         }</style>
       </head>
       <body>
         <div id="container"></div>
-        <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-bundle.min.js"></script>
-        <script type="text/javascript">anychart.onDocumentReady(function () {
+        <script src="http://localhost:3000/anychart-bundle.min.js"></script>
+        <script type="text/javascript">
           var json = ${json};
           var chart = anychart.fromJson(json);
-          chart.container('container').draw();
-        });</script>
+          chart.animation(false);
+          chart.container('container').draw();</script>
       </body>
   </html>`;
 
@@ -43,9 +43,10 @@ const handleQueue = async () => {
   if (pageIndex === -1) return;
 
   const { req, res, start } = queue.shift();
-  const json = JSON.stringify(req.body);
-  const html = getHtmlContent(json);
-  await tabPool.assignExportTask(pageIndex, html);
+  const { config, width = 600, height = 600 } = req.body;
+  const json = JSON.stringify(config);
+  const html = getHtmlContent(json, width, height);
+  await tabPool.assignExportTask(pageIndex, html, width, height);
   res.end();
   const end = process.hrtime.bigint();
   console.log(`Handler execution time ${Number(end - start) / 1000000} ms`);
