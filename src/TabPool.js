@@ -6,7 +6,7 @@ export default class TabPool {
   constructor(screenshotsDirPath, tabsCount = 5) {
     this.tabsCount = tabsCount;
     this.screenshotsDirPath = screenshotsDirPath;
-    this.isHeadless = false;
+    this.isHeadless = true;
     this.pages = [];
     this.browser = null;
     this.context = null;
@@ -43,10 +43,11 @@ export default class TabPool {
     // TODO: найти решение с отрисовкой
     // await page.page.route('**', route => route.continue());
     // await page.page.reload({ waitUntil: 'domcontentloaded' });
-    // await page.page.goto('http://localhost:3000');
-    await page.page.setContent(html);
+    await page.page.goto('http://localhost:3000', { waitUntil: 'domcontentloaded' });
+    await page.page.setContent(html, { waitUntil: 'domcontentloaded' });
     const path = join(this.screenshotsDirPath, `${process.hrtime.bigint()}.jpg`);
     const chart = await page.page.$('#container');
+    // TODO: quality, jpg/png
     await chart.screenshot({ path });
     page.isIdle = true;
   }
