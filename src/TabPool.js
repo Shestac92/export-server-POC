@@ -37,7 +37,7 @@ export default class TabPool {
     return -1;
   }
 
-  async assignExportTask(pageIndex, html) {
+  async assignExportTask(pageIndex, html, width, height) {
     const page = this.pages[pageIndex];
     page.isIdle = false;
     // TODO: найти решение с отрисовкой
@@ -46,9 +46,16 @@ export default class TabPool {
     await page.page.goto('http://localhost:3000', { waitUntil: 'domcontentloaded' });
     await page.page.setContent(html, { waitUntil: 'domcontentloaded' });
     const path = join(this.screenshotsDirPath, `${process.hrtime.bigint()}.jpg`);
-    const chart = await page.page.$('#container');
     // TODO: quality, jpg/png
-    await chart.screenshot({ path });
+    await page.page.screenshot({
+      path,
+      clip: {
+        x: 0,
+        y: 0,
+        width,
+        height
+      }
+    });
     page.isIdle = true;
   }
 }
