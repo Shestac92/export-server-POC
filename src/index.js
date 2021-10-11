@@ -1,14 +1,13 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const monitor = require('express-status-monitor');
-const { mkdirSync, existsSync } = require('fs');
-const { resolve } = require('path');
-const TabPool = require('./TabPool');
+import express from 'express';
+import monitor from 'express-status-monitor';
+import { mkdirSync, existsSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import TabPool from './TabPool';
 
 const PORT = 3000;
-const screenshotsDirPath = resolve(__dirname, '..', 'screenshots');
+const screenshotsDirPath = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'screenshots');
 const app = express();
-const jsonParser = bodyParser.json();
 const tabPool = new TabPool(screenshotsDirPath, 5);
 
 const getHtmlContent = (json, width, height) => `
@@ -60,8 +59,9 @@ if (!existsSync(screenshotsDirPath)) {
 
 app.use(express.static('public'));
 app.use(monitor());
+app.use(express.json());
 
-app.post('/', jsonParser, async (req, res) => {
+app.post('/', async (req, res) => {
   const start = process.hrtime.bigint();
 
   queue.push({ req, res, start });
@@ -72,11 +72,6 @@ app.get('/stop', async (req, res) => {
   await browser.close();
   res.send();
   process.exit(0);
-});
-
-// dummy route for loading tests
-app.get('/dummy', (req, res) => {
-  res.send();
 });
 
 app.listen(PORT, async () => {

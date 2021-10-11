@@ -1,8 +1,8 @@
 /* eslint-disable no-await-in-loop */
-const { chromium } = require('playwright-chromium');
-const { join } = require('path');
+import { chromium } from 'playwright-chromium';
+import { join } from 'path';
 
-module.exports = class TabPool {
+export default class TabPool {
   constructor(screenshotsDirPath, tabsCount = 5) {
     this.tabsCount = tabsCount;
     this.screenshotsDirPath = screenshotsDirPath;
@@ -50,4 +50,4 @@ module.exports = class TabPool {
     await chart.screenshot({ path });
     page.isIdle = true;
   }
-};
+}
