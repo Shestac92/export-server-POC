@@ -7,7 +7,7 @@ export default class TabPool {
     this.tabsCount = tabsCount;
     this.screenshotsDirPath = screenshotsDirPath;
     this.isHeadless = true;
-    this.pages = [];
+    this.workers = [];
     this.browser = null;
     this.context = null;
   }
@@ -22,32 +22,33 @@ export default class TabPool {
   }
 
   async populatePages() {
-    if (this.pages.length) return;
+    if (this.workers.length) return;
 
     for (let i = 0; i < this.tabsCount; i++) {
       const page = await this.context.newPage();
-      this.pages.push({ page, isIdle: true });
+      this.workers.push({ page, isIdle: true });
     }
   }
 
   getIdlePage() {
     for (let i = 0; i < this.tabsCount; i++) {
-      if (this.pages[i].isIdle) return i;
+      if (this.workers[i].isIdle) return i;
     }
     return -1;
   }
 
   async assignExportTask(pageIndex, html, width, height) {
-    const page = this.pages[pageIndex];
-    page.isIdle = false;
+    const worker = this.workers[pageIndex];
+    const { page } = worker;
+    worker.isIdle = false;
     // TODO: найти решение с отрисовкой
     // await page.page.route('**', route => route.continue());
     // await page.page.reload({ waitUntil: 'domcontentloaded' });
-    await page.page.goto('http://localhost:3000', { waitUntil: 'domcontentloaded' });
-    await page.page.setContent(html, { waitUntil: 'domcontentloaded' });
+    await page.goto('http://localhost:3000', { waitUntil: 'domcontentloaded' });
+    await page.setContent(html, { waitUntil: 'domcontentloaded' });
     const path = join(this.screenshotsDirPath, `${process.hrtime.bigint()}.jpg`);
     // TODO: quality, jpg/png
-    await page.page.screenshot({
+    await page.screenshot({
       path,
       clip: {
         x: 0,
@@ -56,6 +57,6 @@ export default class TabPool {
         height
       }
     });
-    page.isIdle = true;
+    worker.isIdle = true;
   }
 }
