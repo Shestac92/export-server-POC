@@ -2,14 +2,14 @@ config:
   target: "http://localhost:3000"
   phases:
     - duration: 20
-      arrivalRate: 10
+      arrivalRate: 5
       name: Warm up
     - duration: 40
-      arrivalRate: 17
-      # rampTo: 30
+      arrivalRate: 5
+      rampTo: 10
       name: Ramp up load
     - duration: 40
-      arrivalRate: 17
+      arrivalRate: 10
       name: Sustained load
 
 scenarios:
@@ -19,22 +19,13 @@ scenarios:
           url: "/"
           json:
             {
-              "config":
+              "chart":
                 {
-                  "chart":
-                    {
-                      "type": "pie",
-                      "data":
-                        [
-                          { "x": "Apples", "value": "128.14", "fill": "green" },
-                          {
-                            "x": "Oranges",
-                            "value": "128.14",
-                            "fill": "orange",
-                          },
-                        ],
-                    },
-                },
-              "width": 300,
-              "height": 400
+                  "type": "pie",
+                  "data":
+                    [
+                      { "x": "Apples", "value": "128.14", "fill": "green" },
+                      { "x": "Oranges", "value": "128.14", "fill": "orange" },
+                    ],
+                }
             }

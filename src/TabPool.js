@@ -16,9 +16,21 @@ export default class TabPool {
     if (this.browser) return;
 
     this.browser = await chromium.launch(
-      { headless: this.isHeadless, viewport: { width: 1280, height: 1280 } }
+      { headless: this.isHeadless }
     );
-    this.context = await this.browser.newContext({ ignoreHTTPSErrors: true, locale: 'en-US' });
+    this.context = await this.browser.newContext({
+      ignoreHTTPSErrors: true,
+      locale: 'en-US',
+      viewport: {
+        width: 1280,
+        height: 1280
+      },
+      screen: {
+        width: 1280,
+        height: 1280
+      },
+      deviceScaleFactor: 2
+    });
   }
 
   async populatePages() {
@@ -37,26 +49,14 @@ export default class TabPool {
     return -1;
   }
 
-  async assignExportTask(pageIndex, html, width, height) {
+  async assignExportTask(pageIndex, html) {
     const worker = this.workers[pageIndex];
     const { page } = worker;
     worker.isIdle = false;
-    // TODO: найти решение с отрисовкой
-    // await page.page.route('**', route => route.continue());
-    // await page.page.reload({ waitUntil: 'domcontentloaded' });
     await page.goto('http://localhost:3000', { waitUntil: 'domcontentloaded' });
-    await page.setContent(html, { waitUntil: 'domcontentloaded' });
-    const path = join(this.screenshotsDirPath, `${process.hrtime.bigint()}.jpg`);
-    // TODO: quality, jpg/png
-    await page.screenshot({
-      path,
-      clip: {
-        x: 0,
-        y: 0,
-        width,
-        height
-      }
-    });
+    await page.setContent(html, { waitUntil: 'load' });
+    const path = join(this.screenshotsDirPath, `${process.hrtime.bigint()}.png`);
+    await page.screenshot({ path });
     worker.isIdle = true;
   }
 }
